@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoneword Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        input, button { font-size: 18px; padding: 10px; margin: 10px; }
+        #results { margin-top: 20px; white-space: pre-wrap; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <h2>Phoneword Generator</h2>
+    <p>Enter a 5 to 10-digit phone number:</p>
+    <input type="text" id="phoneNumber" placeholder="e.g., 43556">
+    <button onclick="generateWords()">Generate</button>
+
+    <div id="results"></div>
+
+    <script>
+        // Phone keypad mapping
+        const keypadMap = {
+            '2': 'ABC', '3': 'DEF', '4': 'GHI',
+            '5': 'JKL', '6': 'MNO', '7': 'PQRS',
+            '8': 'TUV', '9': 'WXYZ'
+        };
+
+        // Built-in dictionary (use real words for testing)
+        const dictionaryWords = new Set(["HELLO", "WORLD", "FOOD", "TREE", "CARS", "PIZZA", "FOOBARS", "DOOBARS", "TRECOBE", "TREECOD"]);
+
+        // Validate phone number (allow 5 to 10 digits)
+        function isValidPhoneNumber(number) {
+            return /^[2-9]{5,10}$/.test(number);
+        }
+
+        // Generate possible words from the phone number
+        function generateWords() {
+            const phoneNumber = document.getElementById("phoneNumber").value.trim();
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
+
+            if (!isValidPhoneNumber(phoneNumber)) {
+                resultsDiv.innerHTML = "<p style='color:red;'>Invalid number! Please enter 5 to 10 digits (no 0 or 1).</p>";
+                return;
+            }
+
+            let results = [];
+            generateCombinations(phoneNumber, 0, "", results);
+
+            console.log("Generated Words (Before Filtering):", results); // Debugging
+
+            // Filter valid words
+            let validWords = results.filter(word => dictionaryWords.has(word));
+
+            resultsDiv.innerHTML = validWords.length > 0 
+                ? "<b>Possible word combinations:</b><br>" + validWords.join("<br>") 
+                : "<p>No valid words found.</p>";
+        }
+
+        // Recursive function to create word combinations
+        function generateCombinations(number, index, current, results) {
+            if (index === number.length) {
+                results.push(current);
+                return;
+            }
+
+            let digit = number[index];
+            if (keypadMap[digit]) {
+                for (let letter of keypadMap[digit]) {
+                    generateCombinations(number, index + 1, current + letter, results);
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
